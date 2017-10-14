@@ -1,4 +1,7 @@
+pragma solidity ^0.4.15;
+
 import "./Permissions.sol";
+
 
 contract PermissionExtension {
 
@@ -16,6 +19,7 @@ contract PermissionExtension {
     bool check = Permissions(permissionsContractAddress).checkPermission(checkingAddress, levelName);
     return check;
   }
+
   /*
     function setPermissionsContractAddress(address _permissionsContractAddress)  {
       permissionsContractAddress = _permissionsContractAddress;

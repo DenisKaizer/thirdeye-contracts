@@ -1,9 +1,14 @@
+pragma solidity ^0.4.15;
+
+
 import "./PermissionExtension.sol";
 import "./Stats.sol";
+
 
 contract StatsExtension {
 
   address public statsContractAddress = 0x08970fed061e7747cd9a38d680a601510cb659fb;
+
   function changeReviewer(address reviewerAddress, uint bounty, bytes32 category) {
     Stats(statsContractAddress).changeReviewerStatistics(reviewerAddress, bounty, category);
   }
@@ -20,6 +25,7 @@ contract StatsExtension {
   }
 }
 
+
 contract CompanyFactory is PermissionExtension {
 
   address owner = msg.sender;
@@ -32,6 +38,7 @@ contract CompanyFactory is PermissionExtension {
     setAdmin(companies[msg.sender]);
   }
 }
+
 
 contract Company is PermissionExtension {
 
@@ -65,9 +72,9 @@ contract Company is PermissionExtension {
 contract Code is PermissionExtension {
 
   struct Rewards {
-  uint256 critical;
-  uint256 major;
-  uint256 minor;
+    uint256 critical;
+    uint256 major;
+    uint256 minor;
   }
 
   string public keyForCode;
@@ -109,7 +116,6 @@ contract Code is PermissionExtension {
     rewards.minor = _minor;
     owner = _owner;
     isOpen = true;
-
   }
 
   function addClaim(uint256 lineStart, uint256 lineEnd, string comment, bytes32 category) {
@@ -127,6 +133,7 @@ contract Code is PermissionExtension {
         potentialReward = rewards.minor;
       }
     }
+
     require ((sumOfBountyForClaims + potentialReward) < bountyAmount);
     address newClaimAddress;
     newClaimAddress =  new Claim(lineStart, lineEnd, comment, category, msg.sender, owner);
@@ -154,11 +161,12 @@ contract Code is PermissionExtension {
   }
 }
 
+
 contract Claim is PermissionExtension, StatsExtension {
 
   struct LineRange{
-  uint256 lineStart;
-  uint256 lineEnd;
+    uint256 lineStart;
+    uint256 lineEnd;
   }
 
   LineRange public lineRange;
@@ -170,7 +178,6 @@ contract Claim is PermissionExtension, StatsExtension {
   bool public declined;
   address owner;
   address codeOwner;
-
 
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -206,12 +213,14 @@ contract Claim is PermissionExtension, StatsExtension {
     // to do return money to customer
 
   }
+
   /*
       function startDRM() {
           require(declined);
           address DRMaddress = new DRM()
       }
   */
+
   function close() internal {
     isOpen = false;
   }
