@@ -7,7 +7,7 @@ import "./Stats.sol";
 
 contract StatsExtension {
 
-  address public statsContractAddress = 0x08970fed061e7747cd9a38d680a601510cb659fb;
+  address public statsContractAddress = 0x0bbe375ea9facfba96bd727128514a4a3e5192d8;
 
   function changeReviewer(address reviewerAddress, uint bounty, bytes32 category) {
     Stats(statsContractAddress).changeReviewerStatistics(reviewerAddress, bounty, category);
@@ -28,14 +28,20 @@ contract StatsExtension {
 
 contract CompanyFactory is PermissionExtension {
 
-  address owner = msg.sender;
+  address owner;
 
-  mapping (address => address ) public companies;
+  function CompanyFactory() {
+    owner = msg.sender;
+  }
+
   // msg.sender => CompanyAddress
+  mapping (address => address) public companies;
 
-  function createCompany(bytes32 name) {
-    companies[msg.sender] = new Company(name, msg.sender);
-    setAdmin(companies[msg.sender]);
+  function createCompany(bytes32 name, string fileHash) returns (address) {
+    address company = new Company(msg.sender, name, fileHash);
+    companies[msg.sender] = company;
+    setAdmin(company);
+    return company;
   }
 }
 
@@ -46,15 +52,20 @@ contract Company is PermissionExtension {
   address public owner;
   address[] public codes; // [codeAddress]
   uint256 public codeCount;
+  string fileHash;
 
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
 
-  function Company(bytes32 _name, address _owner) {
-    name = _name;
+  event Foo(uint8);
+
+  function Company(address _owner, bytes32 _name, string _fileHash) {
+    Foo(_fileHash);
     owner = _owner;
+    name = _name;
+    fileHash = _fileHash;
   }
 
   event Log(uint);
@@ -225,12 +236,3 @@ contract Claim is PermissionExtension, StatsExtension {
     isOpen = false;
   }
 }
-
-
-
-
-
-
-
-
-

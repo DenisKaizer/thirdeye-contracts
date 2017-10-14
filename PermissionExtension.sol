@@ -5,7 +5,7 @@ import "./Permissions.sol";
 
 contract PermissionExtension {
 
-  address public permissionsContractAddress = 0x5e72914535f202659083db3a02c984188fa26e9f;
+  address public permissionsContractAddress = 0x85cf839b9c37b3a477c0e1df70ad36b5d016107e;
 
   function setPerm(address allowedAddress, bytes32 levelName) internal {
     Permissions(permissionsContractAddress).setPermission(allowedAddress, levelName);
