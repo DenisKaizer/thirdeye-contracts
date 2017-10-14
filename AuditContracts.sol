@@ -1,26 +1,23 @@
-import "./Permissions.sol";
+import "./PermissionExtension.sol";
+import "./Stats.sol";
 
-contract PermissionExtension {
+contract StatsExtension {
 
-  address public permissionsContractAddress = 0xc3c72da7753cd1cf119a67ff84c11abb21f9b587;
-
-  function setPerm(address allowedAddress, bytes32 levelName) internal {
-    Permissions(permissionsContractAddress).setPermission(allowedAddress, levelName);
+  address public statsContractAddress = 0x08970fed061e7747cd9a38d680a601510cb659fb;
+  function changeReviewer(address reviewerAddress, uint bounty, bytes32 category) {
+    Stats(statsContractAddress).changeReviewerStatistics(reviewerAddress, bounty, category);
+  }
+  function changeReviewer(address reviewerAddress) {
+    Stats(statsContractAddress).changeReviewerStatistics(reviewerAddress);
   }
 
-  function setAdmin(address allowedAddress) internal {
-    Permissions(permissionsContractAddress).setAdminPerms(allowedAddress);
+  function changeContractor(address contractorAddress, bytes32 answer, uint256 sum) {
+    Stats(statsContractAddress).changeContractorStatistics(contractorAddress, answer, sum);
   }
 
-  function checkPerm(address checkingAddress, bytes32 levelName) internal returns(bool) {
-    bool check = Permissions(permissionsContractAddress).checkPermission(checkingAddress, levelName);
-    return check;
+  function changeContractor(address contractorAddress) {
+    Stats(statsContractAddress).changeContractorStatistics(contractorAddress);
   }
-  /*
-    function setPermissionsContractAddress(address _permissionsContractAddress)  {
-      permissionsContractAddress = _permissionsContractAddress;
-    }
-  */
 }
 
 contract CompanyFactory is PermissionExtension {
@@ -60,6 +57,7 @@ contract Company is PermissionExtension {
     address newCodeAddress = new Code(keyForCode, behavior, agenda, critical, major, minor, owner, bountyAmount);
     codes.push(newCodeAddress);
     setAdmin(newCodeAddress);
+    setPerm(newCodeAddress, "Code");
   }
 }
 
@@ -156,88 +154,65 @@ contract Code is PermissionExtension {
   }
 }
 
-contract Claim is PermissionExtension {
+contract Claim is PermissionExtension is StatsExtension {
 
-  struct LineRange{
-  uint256 lineStart;
-  uint256 lineEnd;
-  }
-
-  LineRange public lineRange;
-
-  string public comment;
-  bytes32 declinesComment;
-  bytes32 public category;
-  bool isOpen;
-  bool public declined;
-  address owner;
-  address codeOwner;
-
-
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  function Claim(uint256 _lineStart, uint256 _lineEnd, string _comment, bytes32 _category, address _owner, address _codeOwner) {
-    lineRange.lineStart = _lineStart;
-    lineRange.lineEnd = _lineEnd;
-    comment = _comment;
-    category = _category;
-    owner = _owner;
-    codeOwner = _codeOwner;
-  }
-
-  function accept() {
-    require(msg.sender == codeOwner);
-  }
-
-  function decline(bytes32 _declinesComment) { // ?
-    require(msg.sender == codeOwner);
-    declinesComment = _declinesComment;
-    declined = true;
-  }
-
-  function cancelClaim() onlyOwner {
-    isOpen = false;
-    // delete claim at Code address
-  }
-
-  function acceptAnswer() onlyOwner {
-    require(declined);
-    // return money to customer
-  }
-
-  function startDRM() {
-    require(declined);
-  address DRMaddress = new DRM()
-  }
-
-  function close() internal {
-    isOpen = false;
-  }
+struct LineRange{
+uint256 lineStart;
+uint256 lineEnd;
 }
 
+LineRange public lineRange;
 
-contract Stats {
+string public comment;
+bytes32 declinesComment;
+bytes32 public category;
+bool isOpen;
+bool public declined;
+address owner;
+address codeOwner;
 
-  struct ReviewerStats {
-  uint256 sumOfBounties;
-  uint256 countOfClaims;
-  uint256 countOfCriticalBugs;
-  uint256 countOfMinorBugs;
-  uint256 countOfMajorBugs;
-  uint256 countOfDeclinedBugs;
-  }
 
-  struct ContractorStats {
-  uint256 sumOfPaid;
-  uint256 countOfCodes;
-  }
+modifier onlyOwner() {
+require(msg.sender == owner);
+_;
 }
 
+function Claim(uint256 _lineStart, uint256 _lineEnd, string _comment, bytes32 _category, address _owner, address _codeOwner) {
+lineRange.lineStart = _lineStart;
+lineRange.lineEnd = _lineEnd;
+comment = _comment;
+category = _category;
+owner = _owner;
+codeOwner = _codeOwner;
+}
 
+function acceptBug() {
+require(msg.sender == codeOwner);
+}
 
+function declineBug(bytes32 _declinesComment) { // ?
+require(msg.sender == codeOwner);
+declinesComment = _declinesComment;
+declined = true;
+}
 
+function cancelClaim() onlyOwner {
+isOpen = false;
+// delete claim at Code address
+}
 
+function acceptAnswer() onlyOwner {
+require(declined);
+// to do return money to customer
 
+}
+/*
+    function startDRM() {
+        require(declined);
+        address DRMaddress = new DRM()
+    }
+*/
+function close() internal {
+isOpen = false;
+}
+}
