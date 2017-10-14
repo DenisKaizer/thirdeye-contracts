@@ -154,65 +154,74 @@ contract Code is PermissionExtension {
   }
 }
 
-contract Claim is PermissionExtension is StatsExtension {
+contract Claim is PermissionExtension, StatsExtension {
 
-struct LineRange{
-uint256 lineStart;
-uint256 lineEnd;
+  struct LineRange{
+  uint256 lineStart;
+  uint256 lineEnd;
+  }
+
+  LineRange public lineRange;
+
+  string public comment;
+  bytes32 declinesComment;
+  bytes32 public category;
+  bool isOpen;
+  bool public declined;
+  address owner;
+  address codeOwner;
+
+
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  function Claim(uint256 _lineStart, uint256 _lineEnd, string _comment, bytes32 _category, address _owner, address _codeOwner) {
+    lineRange.lineStart = _lineStart;
+    lineRange.lineEnd = _lineEnd;
+    comment = _comment;
+    category = _category;
+    owner = _owner;
+    codeOwner = _codeOwner;
+  }
+
+  function acceptBug() {
+    require(msg.sender == codeOwner);
+  }
+
+  function declineBug(bytes32 _declinesComment) { // ?
+    require(msg.sender == codeOwner);
+    declinesComment = _declinesComment;
+    declined = true;
+  }
+
+  function cancelClaim() onlyOwner {
+    isOpen = false;
+    // delete claim at Code address
+  }
+
+  function acceptAnswer() onlyOwner {
+    require(declined);
+    // to do return money to customer
+
+  }
+  /*
+      function startDRM() {
+          require(declined);
+          address DRMaddress = new DRM()
+      }
+  */
+  function close() internal {
+    isOpen = false;
+  }
 }
 
-LineRange public lineRange;
-
-string public comment;
-bytes32 declinesComment;
-bytes32 public category;
-bool isOpen;
-bool public declined;
-address owner;
-address codeOwner;
 
 
-modifier onlyOwner() {
-require(msg.sender == owner);
-_;
-}
 
-function Claim(uint256 _lineStart, uint256 _lineEnd, string _comment, bytes32 _category, address _owner, address _codeOwner) {
-lineRange.lineStart = _lineStart;
-lineRange.lineEnd = _lineEnd;
-comment = _comment;
-category = _category;
-owner = _owner;
-codeOwner = _codeOwner;
-}
 
-function acceptBug() {
-require(msg.sender == codeOwner);
-}
 
-function declineBug(bytes32 _declinesComment) { // ?
-require(msg.sender == codeOwner);
-declinesComment = _declinesComment;
-declined = true;
-}
 
-function cancelClaim() onlyOwner {
-isOpen = false;
-// delete claim at Code address
-}
 
-function acceptAnswer() onlyOwner {
-require(declined);
-// to do return money to customer
 
-}
-/*
-    function startDRM() {
-        require(declined);
-        address DRMaddress = new DRM()
-    }
-*/
-function close() internal {
-isOpen = false;
-}
-}
