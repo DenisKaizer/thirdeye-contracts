@@ -11,5 +11,5 @@ All key functions and logic parts are implemented using smart contracts to demon
 
  ## Architecture
 <p>
-  <img src="conracts.png" height="400" />
+  <img src="contracts.png" height="400" />
 </p>
