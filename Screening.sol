@@ -17,7 +17,7 @@ contract Ownable {
 contract ScreeningFactory {
 
   address[] public screenings;
-  mapping (address => uint32[]) public ownerScreenings;
+  mapping (address => uint[]) public ownerScreenings;
 
   function createScreening (
   string title,
@@ -27,7 +27,7 @@ contract ScreeningFactory {
   uint16 minorReward,
   uint16 majorReward,
   uint16 criticalReward
-  ) payable
+  ) payable returns (address)
   {
     address screening = new Screening(
     msg.sender,
@@ -42,6 +42,7 @@ contract ScreeningFactory {
 
     screenings.push(screening);
     ownerScreenings[msg.sender].push(screenings.length - 1);
+    return screening;
   }
 }
 
@@ -67,14 +68,15 @@ contract Screening is Ownable {
   bool screeningActive;
 
   modifier notOpenClaims() {
-
+    _;
   }
 
   modifier onlyClaim() {
-
+    _;
   }
 
   function Screening(
+  address _owner,
   string _title,
   bytes32 _fileHash,
   bytes32 _agendaHash,
@@ -83,7 +85,7 @@ contract Screening is Ownable {
   uint16 _majorReward,
   uint16 _criticalReward) payable
   {
-    owner = msg.sender;
+    owner = _owner;
     title = _title;
     fileHash = _fileHash;
     agendaHash = _agendaHash;
@@ -107,9 +109,11 @@ contract Screening is Ownable {
     owner.transfer(this.balance);
   }
 
-  function public createClaim() {
-    _;
+  event claimCreating();
+
+  function  createClaim() public {
     // open
+    claimCreating;
   }
 
   function rewardReviewer(address reviewer, uint value) onlyClaim returns(bool) {
