@@ -5,3 +5,4 @@ migrations/
 test/
 thirdeye-contracts3.iml
 truffle.js
+build/
