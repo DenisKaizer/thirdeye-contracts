@@ -18,7 +18,6 @@ contract ScreeningFactory {
 
   address[] public screenings;
 
-
   mapping (address => uint) public screeningsIndex;
   // screening = > index for delete
   mapping (address => uint[]) public ownerScreenings; // ?
@@ -78,7 +77,7 @@ contract Screening is Ownable {
   uint256 majorReward;
   uint256 criticalReward;
   }
-  uint256 public totalBounty;
+  uint256 public totalAmount;
 
   string public title;
 
@@ -124,7 +123,7 @@ contract Screening is Ownable {
   }
 
   function () payable{
-    totalBounty = msg.value;
+    totalAmount = msg.value;
   }
 
   function pauseScreening() onlyOwner {
@@ -145,16 +144,14 @@ contract Screening is Ownable {
     // and delete in factory
   }
 
-  event claimCreating();
-
-  function  createClaim() public {
-    // open
-    claimCreating;
+  function depositExtraMoney() onlyOwner payable {
+    totalAmount += msg.value;
   }
 
-  // function rewardReviewer(address reviewer, uint value) onlyClaim returns(bool) {
-  //   reviewer.transfer(value);
-  //   return true;
-  // }
+  event reportCreating();
 
+  function  createReport() public {
+    reportCreating;
+  }
 }
+
