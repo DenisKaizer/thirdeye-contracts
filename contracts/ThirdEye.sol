@@ -30,9 +30,7 @@ contract ScreeningFactory {
   }
 
   function createScreening (
-  string title,
   bytes32 fileHash,
-  bytes32 agendaHash,
   bytes32 descriptionHash,
   uint256 minorReward,
   uint256 majorReward,
@@ -42,9 +40,7 @@ contract ScreeningFactory {
     require(msg.value >= criticalReward);
     address screening = new Screening(
     msg.sender,
-    title,
     fileHash,
-    agendaHash,
     descriptionHash,
     minorReward,
     majorReward,
@@ -83,10 +79,7 @@ contract Screening is Ownable {
   }
   uint256 public totalAmount;
 
-  string public title;
-
   bytes32 public fileHash;
-  bytes32 public agendaHash;
   bytes32 public descriptionHash;
 
   address[] public openClaims;
@@ -111,9 +104,7 @@ contract Screening is Ownable {
 
   function Screening(
   address _owner,
-  string _title,
   bytes32 _fileHash,
-  bytes32 _agendaHash,
   bytes32 _descriptionHash,
   uint256 _minorReward,
   uint256 _majorReward,
@@ -121,9 +112,7 @@ contract Screening is Ownable {
   {
     factory = msg.sender;
     owner = _owner;
-    title = _title;
     fileHash = _fileHash;
-    agendaHash = _agendaHash;
     descriptionHash =_descriptionHash;
     rewards.minorReward = _minorReward;
     rewards.majorReward = _majorReward;
