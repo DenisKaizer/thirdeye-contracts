@@ -85,9 +85,9 @@ contract Screening is Ownable {
 
   string public title;
 
-  bytes32 fileHash;
-  bytes32 agendaHash;
-  bytes32 descriptionHash;
+  bytes32 public fileHash;
+  bytes32 public agendaHash;
+  bytes32 public descriptionHash;
 
   address[] public openClaims;
   mapping (address => uint) public claimsIndex;
@@ -95,7 +95,7 @@ contract Screening is Ownable {
 
   address public factory;
 
-  Rewards rewards;
+  Rewards public rewards;
 
   bool public screeningActive;
 
