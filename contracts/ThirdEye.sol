@@ -218,7 +218,8 @@ contract Claim is Ownable {
     uint8 _category,
     bytes32 _comment,
     uint _lineNumber,
-    address _screeningOwner)
+    address _screeningOwner,
+    uint _potentialReward)
   {
     owner = _owner;
     lineNumber = _lineNumber;
