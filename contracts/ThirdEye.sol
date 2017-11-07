@@ -197,13 +197,19 @@ contract Claim is Ownable {
     _;
   }
 
+  event Accepted();
+
   function accept() onlyScreeningOwner {
     Screening(screening).payReward(owner, potentialReward);
     status = 3;
+    Accepted();
   }
+
+  event Rejected();
 
   function reject() onlyScreeningOwner {
     status = 2;
+    Rejected();
   }
 
   function acceptRejection() onlyOwner onlyRejected {
