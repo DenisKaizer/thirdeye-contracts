@@ -52,6 +52,7 @@ contract Screening is Ownable {
   uint256 criticalReward;
   }
   uint256 public totalAmount;
+  uint256 reservedBalance;
 
   bytes32 public fileHash;
   bytes32 public descriptionHash;
@@ -120,10 +121,13 @@ contract Screening is Ownable {
     bool isSent = reviwer.call.gas(3000000).value(valueToPay)();
     require(isSent);
     claims[msg.sender] == false;
+    reservedBalance -= potentialReward;
   }
 
-  function closeClaim() onlyClaim {
+  function closeClaim(uint256 potentialReward) onlyClaim {
     claims[msg.sender] == false;
+    reservedBalance -= potentialReward;
+
   }
 
   event claimCreating(address);
@@ -134,15 +138,15 @@ contract Screening is Ownable {
     uint lineNumber)
     public
   {
-    require(this.balance >= rewards.minorReward);
-    uint potentialReward = rewards.minorReward;
+    require((this.balance - reservedBalance) >= rewards.minorReward);
+    uint potentialReward = rewards.minorReward;  // reward to pay if claim accepted
     if (category == 2) {
-      require(this.balance >= rewards.majorReward);
+      require((this.balance - reservedBalance) >= rewards.majorReward);
       potentialReward = rewards.majorReward;
     }
     else {
       if (category == 3) {
-        require(this.balance >= rewards.criticalReward);
+        require((this.balance - reservedBalance) >= rewards.criticalReward);
         potentialReward = rewards.criticalReward;
       }
     }
@@ -153,6 +157,7 @@ contract Screening is Ownable {
     lineNumber,
     owner,
     potentialReward);
+    reservedBalance += potentialReward;
     claimCreating(claim);
     claims[claim] = true;
   }
@@ -213,12 +218,12 @@ contract Claim is Ownable {
   }
 
   function acceptRejection() onlyOwner onlyRejected {
-    Screening(screening).closeClaim();
+    Screening(screening).closeClaim(potentialReward);
     status = 3;
   }
 
   function cancel() onlyOwner {
-    Screening(screening).closeClaim();
+    Screening(screening).closeClaim(potentialReward);
     status = 3;
   }
 }
