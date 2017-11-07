@@ -16,18 +16,7 @@ contract Ownable {
 
 contract ScreeningFactory {
 
-  address[] public screenings;
-
-  mapping (address => uint) public screeningsIndex;
-  // screening = > index for delete
-  mapping (address => uint[]) public ownerScreenings; // ?
-  // owner => index's
-
   event ScreeningCreate(address);
-
-  function ScreeningFactory() {
-    screenings.push(0x0);
-  }
 
   function createScreening (
   bytes32 fileHash,
@@ -47,27 +36,12 @@ contract ScreeningFactory {
     criticalReward
     );
 
-    screenings.push(screening);
-    ownerScreenings[msg.sender].push(screenings.length - 1);
-    screeningsIndex[screening] = screenings.length - 1;
     bool isSent = screening.call.gas(3000000).value(msg.value)();
     require(isSent);
     ScreeningCreate(screening);
     return screening;
   }
 
-  function deleteScreening() {
-    uint index = screeningsIndex[msg.sender];
-    delete screenings[index];
-  }
-
-  function getScreeningLength() view returns(uint) {
-    return screenings.length;
-  }
-
-  function getScreenings() view returns(address[]) {
-    return screenings;
-  }
 }
 
 contract Screening is Ownable {
@@ -82,9 +56,8 @@ contract Screening is Ownable {
   bytes32 public fileHash;
   bytes32 public descriptionHash;
 
-  address[] public openClaims;
-  mapping (address => uint) public claimsIndex;
-  mapping (address => uint[]) public ownerClaims;
+  mapping (address => bool) public claims;
+  uint openClaims;
 
   address public factory;
 
@@ -93,12 +66,12 @@ contract Screening is Ownable {
   bool public screeningActive;
 
   modifier notOpenClaims() {
-    require(openClaims.length <= 1);
+    require(openClaims == 0);
     _;
   }
 
   modifier onlyClaim() {
-    require(claimsIndex[msg.sender] >= 0);
+    require(claims[msg.sender]);
     _;
   }
 
@@ -118,15 +91,10 @@ contract Screening is Ownable {
     rewards.majorReward = _majorReward;
     rewards.criticalReward = _criticalReward;
     screeningActive = true;
-    openClaims.push(0x0);
   }
 
   function () payable{
     totalAmount = msg.value;
-  }
-
-  function getClaims() view returns(address[]) {
-    return openClaims;
   }
 
   function pauseScreening() onlyOwner {
@@ -142,9 +110,6 @@ contract Screening is Ownable {
   function closeScreening() onlyOwner notOpenClaims {
     screeningActive = false;
     owner.transfer(this.balance);
-    ScreeningFactory(factory).deleteScreening();
-    // event
-    // and delete in factory
   }
 
   function depositExtraMoney() onlyOwner payable {
@@ -154,8 +119,11 @@ contract Screening is Ownable {
   function payReward(address reviwer, uint valueToPay) onlyClaim {
     bool isSent = reviwer.call.gas(3000000).value(valueToPay)();
     require(isSent);
-    uint index = claimsIndex[msg.sender];
-    delete openClaims[index];
+    claims[msg.sender] == false;
+  }
+
+  function closeClaim() onlyClaim {
+    claims[msg.sender] == false;
   }
 
   event claimCreating(address);
@@ -185,11 +153,8 @@ contract Screening is Ownable {
     lineNumber,
     owner,
     potentialReward);
-
-    openClaims.push(claim);
-    claimsIndex[claim] = openClaims.length - 1;
-    ownerClaims[msg.sender].push(openClaims.length - 1);
     claimCreating(claim);
+    claims[claim] = true;
   }
 }
 
@@ -201,6 +166,8 @@ contract Claim is Ownable {
   address screeningOwner;
   address screening;
   uint potentialReward;
+  uint8 status;
+
 
   function Claim (
     address _owner,
@@ -217,6 +184,7 @@ contract Claim is Ownable {
     screeningOwner = _screeningOwner;
     potentialReward = _potentialReward;
     screening = msg.sender;
+    status = 1;
   }
 
   modifier onlyScreeningOwner() {
@@ -224,16 +192,28 @@ contract Claim is Ownable {
     _;
   }
 
+  modifier onlyRejected() {
+    require(status == 2);
+    _;
+  }
+
   function accept() onlyScreeningOwner {
     Screening(screening).payReward(owner, potentialReward);
+    status = 3;
   }
 
   function reject() onlyScreeningOwner {
+    status = 2;
+  }
 
+  function acceptRejection() onlyOwner onlyRejected {
+    Screening(screening).closeClaim();
+    status = 3;
   }
 
   function cancel() onlyOwner {
-
+    Screening(screening).closeClaim();
+    status = 3;
   }
 }
 
