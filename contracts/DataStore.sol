@@ -1,18 +1,27 @@
 pragma solidity ^0.4.0;
 
+import "./Ownable.sol";
 
-contract DataStore {
+contract DataStore is Ownable {
 
-  event createScreening(address, uint);
+  mapping (address => bool) screeningFactorys;
 
-  event deployScreeningFactory(address, uint);
+  event CreateScreening(address);
+  event DeployScreeningFactory(address);
 
-
-  function callEvent(uint version) {
-    createScreening(msg.sender, version);
+  function addNewScreeningFactory(address newScreeningFactory) onlyOwner {
+    screeningFactory[newScreeningFactory] = true;
   }
 
-  function deployScreeningFactory(uint version) {
-    deployScreeningFactory(msg.sender, version);
+  function deleteScreeningFactory(address newScreeningFactory) onlyOwner {
+    screeningFactory[newScreeningFactory] = true;
+  }
+
+  function createScreening(address screeningAddress) {
+    CreateScreening(screeningAddress);
+  }
+
+  function deployScreeningFactory() {
+    DeployScreeningFactory(msg.sender);
   }
 }
