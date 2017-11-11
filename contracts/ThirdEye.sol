@@ -1,28 +1,17 @@
 pragma solidity ^0.4.17;
 
-
-contract Ownable {
-
-  address public owner;
-
-  function Ownable() {
-    owner = msg.sender;
-  }
-
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));
-    owner = newOwner;
-  }
-}
+import "./DataStore.sol";
 
 contract ScreeningFactory {
 
   event ScreeningCreate(address);
+
+  address dataStoreAddress;
+
+  function ScreeningFactory(address _dataStoreAddress) {
+    dataStoreAddress = _dataStoreAddress;
+    DataStore(dataStoreAddress).deployScreeningFactory();
+  }
 
   function createScreening (
     bytes32 fileHash,
@@ -42,12 +31,11 @@ contract ScreeningFactory {
       majorReward,
       criticalReward
     );
-
     // is sent
     require(screening.call.gas(3000000).value(msg.value)());
 
     ScreeningCreate(screening);
-
+    DataStore(dataStoreAddress).createScreening(screening);
     return screening;
   }
 
@@ -67,6 +55,7 @@ contract Screening is Ownable {
   bytes32 public descriptionHash;
 
   mapping (address => bool) public claims;
+  address[] screeningsClaims;
   uint openClaims;
 
   address public factory;
@@ -125,15 +114,15 @@ contract Screening is Ownable {
   function payReward(address reviwer, uint valueToPay) onlyClaim {
     // is sent
     require(reviwer.call.gas(3000000).value(valueToPay)());
-
     claims[msg.sender] == false;
     reservedBalance -= valueToPay;
+    openClaims -= 1;
   }
 
   function closeClaim(uint256 potentialReward) onlyClaim {
     claims[msg.sender] == false;
     reservedBalance -= potentialReward;
-
+    openClaims -= 1;
   }
 
   event claimCreating(address);
@@ -143,7 +132,6 @@ contract Screening is Ownable {
     bytes32 comment,
     uint lineNumber
   )
-
   public {
     require((this.balance - reservedBalance) >= rewards.minorReward);
 
@@ -172,6 +160,12 @@ contract Screening is Ownable {
     reservedBalance += potentialReward;
     claimCreating(claim);
     claims[claim] = true;
+    screeningsClaims.push(claim);
+    openClaims += 1;
+  }
+
+  function getClaims() returns(address[]) {
+    return screeningsClaims;
   }
 
   function () payable {
