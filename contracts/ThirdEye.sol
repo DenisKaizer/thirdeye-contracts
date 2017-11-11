@@ -1,5 +1,6 @@
 pragma solidity ^0.4.17;
 
+
 contract Ownable {
 
   address public owner;
@@ -24,26 +25,29 @@ contract ScreeningFactory {
   event ScreeningCreate(address);
 
   function createScreening (
-  bytes32 fileHash,
-  bytes32 descriptionHash,
-  uint256 minorReward,
-  uint256 majorReward,
-  uint256 criticalReward
-  ) payable returns (address)
-  {
+    bytes32 fileHash,
+    bytes32 descriptionHash,
+    uint256 minorReward,
+    uint256 majorReward,
+    uint256 criticalReward
+  )
+  payable returns (address) {
     require(msg.value >= criticalReward);
+
     address screening = new Screening(
-    msg.sender,
-    fileHash,
-    descriptionHash,
-    minorReward,
-    majorReward,
-    criticalReward
+      msg.sender,
+      fileHash,
+      descriptionHash,
+      minorReward,
+      majorReward,
+      criticalReward
     );
 
-    bool isSent = screening.call.gas(3000000).value(msg.value)();
-    require(isSent);
+    // is sent
+    require(screening.call.gas(3000000).value(msg.value)());
+
     ScreeningCreate(screening);
+
     return screening;
   }
 
@@ -52,9 +56,9 @@ contract ScreeningFactory {
 contract Screening is Ownable {
 
   struct Rewards {
-  uint256 minorReward;
-  uint256 majorReward;
-  uint256 criticalReward;
+    uint256 minorReward;
+    uint256 majorReward;
+    uint256 criticalReward;
   }
   uint256 public totalAmount;
   uint256 reservedBalance;
@@ -71,24 +75,14 @@ contract Screening is Ownable {
 
   bool public screeningActive;
 
-  modifier notOpenClaims() {
-    require(openClaims == 0);
-    _;
-  }
-
-  modifier onlyClaim() {
-    require(claims[msg.sender]);
-    _;
-  }
-
   function Screening(
-  address _owner,
-  bytes32 _fileHash,
-  bytes32 _descriptionHash,
-  uint256 _minorReward,
-  uint256 _majorReward,
-  uint256 _criticalReward)
-  {
+    address _owner,
+    bytes32 _fileHash,
+    bytes32 _descriptionHash,
+    uint256 _minorReward,
+    uint256 _majorReward,
+    uint256 _criticalReward
+  ) {
     factory = msg.sender;
     owner = _owner;
     fileHash = _fileHash;
@@ -99,8 +93,14 @@ contract Screening is Ownable {
     screeningActive = true;
   }
 
-  function () payable{
-    totalAmount = msg.value;
+  modifier notOpenClaims() {
+    require(openClaims == 0);
+    _;
+  }
+
+  modifier onlyClaim() {
+    require(claims[msg.sender]);
+    _;
   }
 
   function pauseScreening() onlyOwner {
@@ -123,8 +123,9 @@ contract Screening is Ownable {
   }
 
   function payReward(address reviwer, uint valueToPay) onlyClaim {
-    bool isSent = reviwer.call.gas(3000000).value(valueToPay)();
-    require(isSent);
+    // is sent
+    require(reviwer.call.gas(3000000).value(valueToPay)());
+
     claims[msg.sender] == false;
     reservedBalance -= valueToPay;
   }
@@ -140,11 +141,14 @@ contract Screening is Ownable {
   function  createClaim(
     uint8 category,
     bytes32 comment,
-    uint lineNumber)
-    public
-  {
+    uint lineNumber
+  )
+
+  public {
     require((this.balance - reservedBalance) >= rewards.minorReward);
+
     uint potentialReward = rewards.minorReward;  // reward to pay if claim accepted
+
     if (category == 2) {
       require((this.balance - reservedBalance) >= rewards.majorReward);
       potentialReward = rewards.majorReward;
@@ -155,16 +159,23 @@ contract Screening is Ownable {
         potentialReward = rewards.criticalReward;
       }
     }
+
     address claim = new Claim (
-    msg.sender,
-    category,
-    comment,
-    lineNumber,
-    owner,
-    potentialReward);
+      msg.sender,
+      category,
+      comment,
+      lineNumber,
+      owner,
+      potentialReward
+    );
+
     reservedBalance += potentialReward;
     claimCreating(claim);
     claims[claim] = true;
+  }
+
+  function () payable {
+    totalAmount = msg.value;
   }
 }
 
@@ -232,4 +243,3 @@ contract Claim is Ownable {
     status = 3;
   }
 }
-
