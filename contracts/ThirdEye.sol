@@ -170,14 +170,14 @@ contract Screening is Ownable {
 
 contract Claim is Ownable {
 
+  address screeningOwner;
+  address screening;
+
   uint lineNumber;
   bytes32 comment;
   uint8 category;
-  address screeningOwner;
-  address screening;
   uint potentialReward;
-  uint8 status;
-
+  uint8 status; // 1 - pending, 2 - accepted by customer, 3 - rejected by customer, 4 - rejection accepted
 
   function Claim (
     address _owner,
@@ -185,8 +185,8 @@ contract Claim is Ownable {
     bytes32 _comment,
     uint _lineNumber,
     address _screeningOwner,
-    uint _potentialReward)
-  {
+    uint _potentialReward
+  ) {
     owner = _owner;
     lineNumber = _lineNumber;
     comment = _comment;
