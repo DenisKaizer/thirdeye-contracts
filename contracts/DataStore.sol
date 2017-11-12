@@ -17,7 +17,7 @@ contract Ownable {
   }
 }
 
-contract DataStore {
+contract DataStore is Ownable {
 
   mapping (address => bool) public screeningFactorys ;
   address[] screenings;
@@ -29,9 +29,9 @@ contract DataStore {
     screenings.push(screeningAddress);
   }
 
-  function deployScreeningFactory() {
-    require(screeningFactorys[msg.sender]);
-    DeployScreeningFactory(msg.sender);
+  function deployScreeningFactory(address screeningFactoryAddress) onlyOwner {
+    screeningFactorys[screeningFactoryAddress] = true;
+    DeployScreeningFactory(screeningFactoryAddress);
   }
 
   function getScreenings() returns(address[]) {

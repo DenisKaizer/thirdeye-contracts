@@ -10,26 +10,25 @@ contract ScreeningFactory {
 
   function ScreeningFactory(address _dataStoreAddress) {
     dataStoreAddress = _dataStoreAddress;
-    DataStore(dataStoreAddress).deployScreeningFactory();
   }
 
   function createScreening (
-    bytes32 fileHash,
-    bytes32 descriptionHash,
-    uint256 minorReward,
-    uint256 majorReward,
-    uint256 criticalReward
+  bytes32 fileHash,
+  bytes32 descriptionHash,
+  uint256 minorReward,
+  uint256 majorReward,
+  uint256 criticalReward
   )
   payable returns (address) {
     require(msg.value >= criticalReward);
 
     address screening = new Screening(
-      msg.sender,
-      fileHash,
-      descriptionHash,
-      minorReward,
-      majorReward,
-      criticalReward
+    msg.sender,
+    fileHash,
+    descriptionHash,
+    minorReward,
+    majorReward,
+    criticalReward
     );
     // is sent
     require(screening.call.gas(3000000).value(msg.value)());
@@ -44,9 +43,9 @@ contract ScreeningFactory {
 contract Screening is Ownable {
 
   struct Rewards {
-    uint256 minorReward;
-    uint256 majorReward;
-    uint256 criticalReward;
+  uint256 minorReward;
+  uint256 majorReward;
+  uint256 criticalReward;
   }
   uint256 public totalAmount;
   uint256 reservedBalance;
@@ -65,12 +64,12 @@ contract Screening is Ownable {
   bool public screeningActive;
 
   function Screening(
-    address _owner,
-    bytes32 _fileHash,
-    bytes32 _descriptionHash,
-    uint256 _minorReward,
-    uint256 _majorReward,
-    uint256 _criticalReward
+  address _owner,
+  bytes32 _fileHash,
+  bytes32 _descriptionHash,
+  uint256 _minorReward,
+  uint256 _majorReward,
+  uint256 _criticalReward
   ) {
     factory = msg.sender;
     owner = _owner;
@@ -128,9 +127,9 @@ contract Screening is Ownable {
   event claimCreating(address);
 
   function  createClaim(
-    uint8 category,
-    bytes32 comment,
-    uint lineNumber
+  uint8 category,
+  bytes32 comment,
+  uint lineNumber
   )
   public {
     require((this.balance - reservedBalance) >= rewards.minorReward);
@@ -149,12 +148,12 @@ contract Screening is Ownable {
     }
 
     address claim = new Claim (
-      msg.sender,
-      category,
-      comment,
-      lineNumber,
-      owner,
-      potentialReward
+    msg.sender,
+    category,
+    comment,
+    lineNumber,
+    owner,
+    potentialReward
     );
 
     reservedBalance += potentialReward;
@@ -185,12 +184,12 @@ contract Claim is Ownable {
   uint8 status; // 1 - pending, 2 - accepted by customer, 3 - rejected by customer, 4 - rejection accepted
 
   function Claim (
-    address _owner,
-    uint8 _category,
-    bytes32 _comment,
-    uint _lineNumber,
-    address _screeningOwner,
-    uint _potentialReward
+  address _owner,
+  uint8 _category,
+  bytes32 _comment,
+  uint _lineNumber,
+  address _screeningOwner,
+  uint _potentialReward
   ) {
     owner = _owner;
     lineNumber = _lineNumber;
