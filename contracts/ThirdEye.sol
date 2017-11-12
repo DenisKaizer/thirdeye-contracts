@@ -47,7 +47,7 @@ contract Screening is Ownable {
   uint256 majorReward;
   uint256 criticalReward;
   }
-  uint256 public totalAmount;
+  uint256 public totalReward;
   uint256 reservedBalance;
 
   bytes32 public fileHash;
@@ -107,7 +107,7 @@ contract Screening is Ownable {
   }
 
   function depositExtraMoney() onlyOwner payable {
-    totalAmount += msg.value;
+    totalReward += msg.value;
   }
 
   function payReward(address reviwer, uint valueToPay) onlyClaim {
@@ -168,7 +168,7 @@ contract Screening is Ownable {
   }
 
   function () payable {
-    totalAmount = msg.value;
+    totalReward = msg.value;
   }
 }
 
