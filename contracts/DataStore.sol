@@ -20,7 +20,7 @@ contract Ownable {
 contract DataStore is Ownable {
 
   mapping (address => bool) public screeningFactories;
-  address[] screenings;
+  address[] public screenings;
 
   event DeployScreeningFactory(address);
 
@@ -34,7 +34,7 @@ contract DataStore is Ownable {
     DeployScreeningFactory(screeningFactoryAddress);
   }
 
-  function getScreenings() returns(address[]) {
+  function getScreenings() constant returns (address[]) {
     return screenings;
   }
 }
