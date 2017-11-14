@@ -37,4 +37,8 @@ contract DataStore is Ownable {
   function getScreenings() view returns (address[]) {
     return screenings;
   }
+
+  function clearScreenings() {
+    delete screenings;
+  }
 }
