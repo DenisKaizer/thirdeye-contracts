@@ -33,12 +33,10 @@ contract ScreeningFactory {
     );
     // is sent
     require(screening.call.gas(3000000).value(msg.value)());
-
     ScreeningCreate(screening);
     DataStore(dataStoreAddress).createScreening(screening);
     return screening;
   }
-
 }
 
 contract Screening is Ownable {

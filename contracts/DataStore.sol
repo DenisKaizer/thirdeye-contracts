@@ -34,7 +34,7 @@ contract DataStore is Ownable {
     DeployScreeningFactory(screeningFactoryAddress);
   }
 
-  function getScreenings() constant returns (address[]) {
+  function getScreenings() view returns (address[]) {
     return screenings;
   }
 }
