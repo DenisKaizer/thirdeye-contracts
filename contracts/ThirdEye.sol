@@ -105,9 +105,10 @@ contract Screening is Ownable {
     owner.transfer(this.balance);
   }
 
-  function depositExtraMoney() onlyOwner payable {
-    totalReward += msg.value;
-  }
+
+  //function depositExtraMoney() onlyOwner payable {
+    //totalReward += msg.value;
+  //}
 
   function payReward(address reviwer, uint valueToPay) onlyClaim {
     // is sent
@@ -167,7 +168,7 @@ contract Screening is Ownable {
   }
 
   function () payable {
-    totalReward = msg.value;
+    totalReward += msg.value;
   }
 }
 
