@@ -5,7 +5,7 @@ import "./DataStore.sol";
 
 contract ScreeningFactory {
 
-  event ScreeningCreate(address);
+  event CreateScreening(address);
 
   address dataStoreAddress;
 
@@ -124,7 +124,7 @@ contract Screening is Ownable {
     openClaims -= 1;
   }
 
-  event claimCreating(address);
+  event CreateClaim(address);
 
   function  createClaim(
     uint8 category,

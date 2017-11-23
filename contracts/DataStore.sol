@@ -23,10 +23,16 @@ contract DataStore is Ownable {
   address[] public screenings;
 
   event DeployScreeningFactory(address);
+  event CreateScreening(address);
+  event CreateClaim(address);
 
   function createScreening(address screeningAddress) {
     require(screeningFactories[msg.sender]);
     screenings.push(screeningAddress);
+  }
+
+  function createClaim(claimAddress) {
+    CreateClaim(claimAddress);
   }
 
   function deployScreeningFactory(address screeningFactoryAddress) onlyOwner {
