@@ -33,7 +33,7 @@ contract ScreeningFactory {
     );
     // is sent
     require(screening.call.gas(3000000).value(msg.value)());
-    ScreeningCreate(screening);
+    CreateScreening(screening);
     DataStore(dataStoreAddress).createScreening(screening);
     return screening;
   }
@@ -157,7 +157,7 @@ contract Screening is Ownable {
     );
 
     reservedBalance += potentialReward;
-    claimCreating(claim);
+    CreateClaim(claim);
     claims[claim] = true;
     screeningsClaims.push(claim);
     openClaims += 1;
