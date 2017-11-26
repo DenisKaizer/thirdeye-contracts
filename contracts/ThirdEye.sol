@@ -111,8 +111,8 @@ contract Screening is Ownable {
   //}
 
   function payReward(address reviwer, uint valueToPay) onlyClaim {
-    // is sent
-    require(reviwer.call.gas(3000000).value(valueToPay)());
+    bool isSent = reviwer.call.gas(3000000).value(valueToPay)();
+    require(isSent);
     claims[msg.sender] == false;
     reservedBalance -= valueToPay;
     openClaims -= 1;
