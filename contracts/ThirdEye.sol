@@ -111,8 +111,9 @@ contract Screening is Ownable {
   //}
 
   function payReward(address reviewer, uint valueToPay) onlyClaim {
-    bool isSent = reviewer.call.gas(3000000).value(valueToPay)();
-    require(isSent);
+    //bool isSent = reviewer.call.gas(3000000).value(valueToPay)();
+    //require(isSent);
+    reviewer.transfer(valueToPay);
     claims[msg.sender] == false;
     reservedBalance -= valueToPay;
     openClaims -= 1;
