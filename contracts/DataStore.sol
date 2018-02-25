@@ -31,7 +31,7 @@ contract DataStore is Ownable {
     screenings.push(screeningAddress);
   }
 
-  function createClaim(claimAddress) {
+  function createClaim(address claimAddress) {
     CreateClaim(claimAddress);
   }
 
