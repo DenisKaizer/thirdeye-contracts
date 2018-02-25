@@ -1,8 +1,0 @@
-# Created by .ignore support plugin (hsz.mobi)
-.idea/
-migrations/
-test/
-thirdeye-contracts3.iml
-truffle.js
-build/
-truffle-config.js
